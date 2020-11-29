@@ -135,7 +135,6 @@ class VentanaLecturaArchivo:
         self.ventaDatosRuta.geometry(str(ancho) + "x" + str(alto) + "+" + str(posx) + "+" + str(posy))
         self.ventaDatosRuta.attributes('-alpha', 0.0)
         self.ventaDatosRuta.resizable(0, 0)
-
         # Configuración widgets
         self.miFuente = tkFont.Font(size=10)
         self.etiquetaArchivo = tk.Label(self.ventaDatosRuta, 
