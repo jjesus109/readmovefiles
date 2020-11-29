@@ -13,15 +13,12 @@ from tkinter.filedialog import askopenfilename, asksaveasfilename, askdirectory
 from tkinter.colorchooser import askcolor
 from tkinter import messagebox
 import tkinter.font as tkFont
-
 import pandas as pd
-
 
 class VentanaPrincipal(tk.Frame):
     def __init__(self, parent=None):
         tk.Frame.__init__(self, parent)
         self.parent = parent
-        self.yaGuardo = True
         self.init_ui()
 
     def init_ui(self):
@@ -30,35 +27,22 @@ class VentanaPrincipal(tk.Frame):
         
         self.a = self.parent.winfo_screenwidth()
         self.h = self.parent.winfo_screenheight()
-        print(f"a: {self.a}")
-        print(f"h: {self.h}")
-
         # Para manejar el evento cuando se cierre la ventana
         self.parent.protocol("WM_DELETE_WINDOW", self.cerrandoVentana)
 
-        # Muestra la ventana maximizada
-        try:
-            self.parent.state('zoomed')
-        except:
-            self.parent.state('normal')
+
 
         # Título de la ventana
-        self.parent.title("Lee y mueve")
-
+        self.parent.title("Read and move.tool")
         # Medidas minimas a las que se puede ajustar la ventana
         self.parent.minsize(400, 400)
 
-        # Icono de la ventana
- 
-        self.anchoLienzo = self.a * 0.65
-
-        self.altoLienzo = self.h
         ancho = 400
         alto = 400
         posx = int((self.a - ancho) / 2)
         posy = int((self.h - alto) / 2)
         self.parent.geometry(str(ancho) + "x" + str(alto) + "+" + str(posx) + "+" + str(posy))
-        self.parent.attributes('-alpha', 0.0)
+        
         self.parent.resizable(0, 0)
         # Se crea un menu
         self.menubar = tk.Menu(self.parent)
@@ -86,26 +70,28 @@ class VentanaPrincipal(tk.Frame):
                                 command=self.cerrandoVentana, 
                                 accelerator="Ctrl+s")
 
-        self.menubar.add_cascade(label="Acerca",  accelerator="Ctrl+d")
+        self.menubar.add_cascade(label="Acerca", command=self.mostrarAcercaDe)
         self.menubar.add_cascade(label="Ayuda", accelerator="Ctrl+y")
         
         # Bineo a atajos de teclado
         self.parent.bind("<Control-s>", self.cerrandoVentanaEvent)
         self.parent.bind("<Control-n>", self.abrirProcesoEvent)
-
+        
     def cerrandoVentanaEvent(self, event):
         self.cerrandoVentana()
 
     def abrirProcesoEvent(self, event):
         self.abrirNuevo()
 
-   
+    def mostrarAcercaDe(self):
+        messagebox.showinfo("Acerca de esta herramienta",
+                            "Herramienta creada para tia Anit con <3")
     """Función para evitar cerrar abruptamente el programa"""
 
     def cerrandoVentana(self):
 
-        respuestaDeCierre = messagebox.askyesno("Salir de Lee y Mueve", 
-                                                "¿Desea realmente salir de Lee y mueve")
+        respuestaDeCierre = messagebox.askyesno("Salir de Read and Move", 
+                                                "¿Desea realmente salir de Read adn Move.tool")
         if respuestaDeCierre == True:
             self.parent.destroy()
 
@@ -127,13 +113,13 @@ class VentanaLecturaArchivo:
         self.variablesBotones = []
         
         # Definicion de tamaño de venatana
-        ancho = 670
+        ancho = 620
         alto = 160
         posx = int((a - ancho) / 2)
         posy = int((h - alto) / 2)
         self.ventaDatosRuta = tk.Toplevel(self.parent)
         self.ventaDatosRuta.geometry(str(ancho) + "x" + str(alto) + "+" + str(posx) + "+" + str(posy))
-        self.ventaDatosRuta.attributes('-alpha', 0.0)
+        
         self.ventaDatosRuta.resizable(0, 0)
         # Configuración widgets
         self.miFuente = tkFont.Font(size=10)
@@ -230,7 +216,7 @@ class VentanaRutas:
         posy = int((h - alto) / 2)
         self.ventaDatosRuta = tk.Toplevel(self.parent)
         self.ventaDatosRuta.geometry(str(ancho) + "x" + str(alto) + "+" + str(posx) + "+" + str(posy))
-        self.ventaDatosRuta.attributes('-alpha', 0.0)
+        
         self.ventaDatosRuta.resizable(0, 0)
 
       
@@ -326,7 +312,7 @@ class VentanaRutas:
 
         self.btnContinuar.grid(column=1, row=9, padx=5, pady=7)
         self.btnAtras.grid(column=0, row=9, padx=1, pady=7)
-        self.ventaDatosRuta.after(0, self.ventaDatosRuta.attributes, '-alpha', 1.0)
+        
         self.ventaDatosRuta.focus_force()
         self.ventaDatosRuta.transient(master=self.parent)
         self.ventaDatosRuta.grab_set()
@@ -438,7 +424,7 @@ class ThreadedTask(threading.Thread):
         posy = int((h - alto) / 2)
         self.ventanaIni = tk.Toplevel(self.parent)
         self.ventanaIni.geometry(str(ancho) + "x" + str(alto) + "+" + str(posx) + "+" + str(posy))
-        self.ventanaIni.attributes('-alpha', 0.0)
+        
         self.ventanaIni.resizable(0, 0)
         try:
             self.ventanaIni.iconbitmap('Logo_Bienvenida_IMP_PREDICT_V2.ico')
@@ -456,7 +442,7 @@ class ThreadedTask(threading.Thread):
         # Posicionamiento
         self.etiquetaC.pack(pady=10)
         self.etiquetaGamma.pack(pady=1)
-        self.ventanaIni.after(0, self.ventanaIni.attributes, '-alpha', 1.0)
+        
         self.ventanaIni.focus_force()
         self.ventanaIni.grab_set()
         self.ventanaIni.transient(master=self.parent)
@@ -511,7 +497,7 @@ class ThreadedTask(threading.Thread):
 """Función principal"""
 def main():
     root = tk.Tk()
-    APP = VentanaPrincipal(root)
+    VentanaPrincipal(root)
 
     root.mainloop()
 
