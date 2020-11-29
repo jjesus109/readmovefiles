@@ -29,8 +29,10 @@ class VentanaPrincipal(tk.Frame):
         self.h = self.parent.winfo_screenheight()
         # Para manejar el evento cuando se cierre la ventana
         self.parent.protocol("WM_DELETE_WINDOW", self.cerrandoVentana)
-
-
+        try:
+            self.parent.iconbitmap('Logo.ico')          
+        except:
+            print("No cargo el logo")
 
         # Título de la ventana
         self.parent.title("Read and move.tool")
@@ -71,35 +73,62 @@ class VentanaPrincipal(tk.Frame):
                                 accelerator="Ctrl+s")
 
         self.menubar.add_cascade(label="Acerca", command=self.mostrarAcercaDe)
-        self.menubar.add_cascade(label="Ayuda", accelerator="Ctrl+y")
+        self.menubar.add_cascade(label="Ayuda", command=self.mostrarAyuda)
         
         # Bineo a atajos de teclado
         self.parent.bind("<Control-s>", self.cerrandoVentanaEvent)
         self.parent.bind("<Control-n>", self.abrirProcesoEvent)
         
     def cerrandoVentanaEvent(self, event):
+        """
+        Evento para cerrar ventana con atajo
+        """
         self.cerrandoVentana()
 
     def abrirProcesoEvent(self, event):
+        """
+        Evento para abrir proceso nuevo
+        """
         self.abrirNuevo()
 
     def mostrarAcercaDe(self):
+        """
+        Muestra informacion sobre la herramienta
+        """
         messagebox.showinfo("Acerca de esta herramienta",
                             "Herramienta creada para tia Anit con <3")
-    """Función para evitar cerrar abruptamente el programa"""
+
+    def mostrarAyuda(self):
+        """
+        Muestra informacion sobre la herramienta
+        """
+        messagebox.showinfo("Ayuda",
+                            "Mandame un email a jesus.javier.albino@gmail.com "+
+                            "con una descripción de tu problema.")
+
+    
+    
 
     def cerrandoVentana(self):
-
+        """
+        Función para evitar cerrar abruptamente el programa
+        """
         respuestaDeCierre = messagebox.askyesno("Salir de Read and Move", 
                                                 "¿Desea realmente salir de Read adn Move.tool")
         if respuestaDeCierre == True:
             self.parent.destroy()
 
     def abrirNuevo(self):
+        """
+        Abre nueva ventana para iniciar proceso
+        """
         VentanaLecturaArchivo(self.parent,"")
 
 
 class VentanaLecturaArchivo:
+    """
+    Ventana de Lectura de archivos Excel
+    """
     def __init__(self, parent,rutaArchivo):
         self.parent = parent
         self.rutaArchivo  = rutaArchivo
@@ -113,13 +142,17 @@ class VentanaLecturaArchivo:
         self.variablesBotones = []
         
         # Definicion de tamaño de venatana
-        ancho = 620
+        ancho = 600
         alto = 160
         posx = int((a - ancho) / 2)
         posy = int((h - alto) / 2)
         self.ventaDatosRuta = tk.Toplevel(self.parent)
         self.ventaDatosRuta.geometry(str(ancho) + "x" + str(alto) + "+" + str(posx) + "+" + str(posy))
-        
+        try:
+            self.ventaDatosRuta.iconbitmap('Logo.ico')          
+        except:
+            print("NO cargo el logo")
+
         self.ventaDatosRuta.resizable(0, 0)
         # Configuración widgets
         self.miFuente = tkFont.Font(size=10)
@@ -189,8 +222,7 @@ class VentanaLecturaArchivo:
             messagebox.showwarning(title="Error",
                             message=e)
             return
-        print("columnas a e leer")
-        print(xls.columns)
+        
         self.columnasDisponibles = list(xls.columns)
         self.ventaDatosRuta.destroy()
         VentanaRutas(self.parent,self.columnasDisponibles,self.rutaArchivo)
@@ -215,6 +247,10 @@ class VentanaRutas:
         posx = int((a - ancho) / 2)
         posy = int((h - alto) / 2)
         self.ventaDatosRuta = tk.Toplevel(self.parent)
+        try:
+            self.ventaDatosRuta.iconbitmap('Logo.ico')          
+        except:
+            print("NO cargo el logo")
         self.ventaDatosRuta.geometry(str(ancho) + "x" + str(alto) + "+" + str(posx) + "+" + str(posy))
         
         self.ventaDatosRuta.resizable(0, 0)
@@ -475,17 +511,18 @@ class ThreadedTask(threading.Thread):
         print(f"Ruta busqeudda: {onlyfiles}")
         columnaTotal = xls[self.columnaAnaliza]
         for i in columnaTotal:
-            if i in onlyfiles:
-                origen = os.path.join(mypath,i)
-                destino =os.path.join(self.rutaDestino,i)
-                print(f"ruta total: {origen}")
-                try:
-                    copyfile(origen,destino)
-                except Exception as e:
-                    print(f"No se logro copiar el archivo")
-                    print(e)
-                    messagebox.showinfo('Upss!', 
-                                        f'No se copio el archivo: {i}')
+            for j in onlyfiles:
+                if i in j:
+                    origen = os.path.join(mypath,i)
+                    destino =os.path.join(self.rutaDestino,j)
+                    print(f"ruta total: {origen}")
+                    try:
+                        copyfile(origen,destino)
+                    except Exception as e:
+                        print(f"No se logro copiar el archivo")
+                        print(e)
+                        messagebox.showinfo('Upss!', 
+                                            f'No se copio el archivo: {i}')
         
             
         self.ventanaIni.destroy()
@@ -498,9 +535,11 @@ class ThreadedTask(threading.Thread):
 def main():
     root = tk.Tk()
     VentanaPrincipal(root)
-
-    root.mainloop()
-
+    try:
+        root.iconbitmap('Logo.ico')
+        root.mainloop()
+    except:
+        root.mainloop()
 
 if __name__ == '__main__':
     main()
