@@ -32,7 +32,7 @@ class VentanaPrincipal(tk.Frame):
         try:
             self.parent.iconbitmap('Logo.ico')          
         except:
-            print("No cargo el logo")
+            print("")
 
         # Título de la ventana
         self.parent.title("Read and move.tool")
@@ -114,7 +114,7 @@ class VentanaPrincipal(tk.Frame):
         Función para evitar cerrar abruptamente el programa
         """
         respuestaDeCierre = messagebox.askyesno("Salir de Read and Move", 
-                                                "¿Desea realmente salir de Read adn Move.tool")
+                                                "¿Desea realmente salir de Read and Move.tool?")
         if respuestaDeCierre == True:
             self.parent.destroy()
 
@@ -142,7 +142,7 @@ class VentanaLecturaArchivo:
         self.variablesBotones = []
         
         # Definicion de tamaño de venatana
-        ancho = 600
+        ancho = 570
         alto = 160
         posx = int((a - ancho) / 2)
         posy = int((h - alto) / 2)
@@ -151,7 +151,7 @@ class VentanaLecturaArchivo:
         try:
             self.ventaDatosRuta.iconbitmap('Logo.ico')          
         except:
-            print("NO cargo el logo")
+            print("")
 
         self.ventaDatosRuta.resizable(0, 0)
         # Configuración widgets
@@ -210,10 +210,11 @@ class VentanaLecturaArchivo:
             self.btnContinuar.config(state="normal")
 
     def lecturaArchivos(self):
+
         try:
             
             xls = pd.read_excel(self.rutaArchivo ) 
-            print(xls)
+
         except FileNotFoundError as e:
             messagebox.showwarning(title="Error",
                             message="No se Encuentra el archivo")
@@ -242,15 +243,15 @@ class VentanaRutas:
         self.variablesBotones = []
         self.columnaAnaliza = self.columnasDisponibles[0]
         # Definicion de tamaño de venatana
-        ancho = 670
-        alto = 470
+        ancho = 570
+        alto = 430
         posx = int((a - ancho) / 2)
         posy = int((h - alto) / 2)
         self.ventaDatosRuta = tk.Toplevel(self.parent)
         try:
             self.ventaDatosRuta.iconbitmap('Logo.ico')          
         except:
-            print("NO cargo el logo")
+            print("")
         self.ventaDatosRuta.geometry(str(ancho) + "x" + str(alto) + "+" + str(posx) + "+" + str(posy))
         
         self.ventaDatosRuta.resizable(0, 0)
@@ -357,7 +358,7 @@ class VentanaRutas:
 
     def printColumna(self,index):
         self.columnaAnaliza = self.columnasDisponibles[index]
-        print(f"La columna selecionada es : {self.columnaAnaliza}")
+
     
 
     def habilitaScrollIntervaloBlind(self, event):
@@ -376,22 +377,24 @@ class VentanaRutas:
         """
         Obtener Ruta de busqueda de archivos
         """
+        dirs = os.path.dirname(os.path.abspath(__file__))
 
-        filename = askdirectory(initialdir="",
+        filename = askdirectory(initialdir=dirs,
                                 title="Seleccionar la ruta para buscar los archivos",
                                 parent=self.ventaDatosRuta)
         if filename == '':
             messagebox.showwarning(title="Advertencia", message="Favor de seleccionar una ruta")
+            return
+
+        self.rutaBusqueda = filename
+        self.campoRutaBusqueda.delete(0, "end")
+        self.campoRutaBusqueda.insert(0, self.rutaBusqueda)
+        # Validación para habilitar o deshabilitar botón de continuar
+        if (self.campoRutaBusqueda.get() == ''
+            or self.campoRutaDestino.get() == ''):
+            self.btnContinuar.config(state="disabled")
         else:
-            self.rutaBusqueda = filename
-            self.campoRutaBusqueda.delete(0, "end")
-            self.campoRutaBusqueda.insert(0, self.rutaBusqueda)
-            # Validación para habilitar o deshabilitar botón de continuar
-            if (self.campoRutaBusqueda.get() == ''
-                or self.campoRutaDestino.get() == ''):
-                self.btnContinuar.config(state="disabled")
-            else:
-                self.btnContinuar.config(state="normal")
+            self.btnContinuar.config(state="normal")
 
     def abrirRutaDestino(self):
 
@@ -413,15 +416,19 @@ class VentanaRutas:
 
 
     def continuar(self):
-        parametros = {
-                    "rutaArchivo":self.rutaArchivo,
-                    "rutaDestino":self.rutaDestino,
-                    "rutaBusqeuda":self.rutaBusqueda,
-                    "columnaAnaliza":self.columnaAnaliza}
-        self.ventaDatosRuta.destroy()
-        self.queueMia = queue.Queue()
-        ThreadedTask(self.queueMia, self.parent, parametros).start()
-        self.parent.after(100, self.process_queue)
+        respuesta = messagebox.askyesno("Inicio de proceo",
+                                        "¿Esta seguro que los datos introducidos son correctos?",
+                                        icon="warning")
+        if respuesta:
+            parametros = {
+                        "rutaArchivo":self.rutaArchivo,
+                        "rutaDestino":self.rutaDestino,
+                        "rutaBusqeuda":self.rutaBusqueda,
+                        "columnaAnaliza":self.columnaAnaliza}
+            self.ventaDatosRuta.destroy()
+            self.queueMia = queue.Queue()
+            ThreadedTask(self.queueMia, self.parent, parametros).start()
+            self.parent.after(100, self.process_queue)
     
     def process_queue(self):
         try:
@@ -466,14 +473,14 @@ class ThreadedTask(threading.Thread):
             self.ventanaIni.iconbitmap('Logo_Bienvenida_IMP_PREDICT_V2.ico')
             self.ventanaIni.title("Procesando....")
         except:
-            self.ventanaIni.title("Procesando....")
+            self.ventanaIni.title("Procesando.")
         self.ventanaIni.protocol("WM_DELETE_WINDOW", self.cerrandoVentanaInicio)
 
         # Configuración widgets
         self.miFuente = tkFont.Font(size=10)
         self.etiquetaC = tk.Label(self.ventanaIni,
-                                  text="El proceso ha iniciado porfavor esper ")
-        self.etiquetaGamma = tk.Label(self.ventanaIni, text="Nota: Esta etapa podría demorar varios minutos...")
+                                  text="El proceso ha iniciado porfavor espee ")
+        self.etiquetaGamma = tk.Label(self.ventanaIni, text="Nota: Esta etapa podría demorar unos minutos.")
 
         # Posicionamiento
         self.etiquetaC.pack(pady=10)
@@ -496,7 +503,6 @@ class ThreadedTask(threading.Thread):
         # Lectura de archivo excel
         try:
             xls = pd.read_excel(self.rutaArchivo ) 
-            print(xls)
         except FileNotFoundError as e:
             messagebox.showwarning(title="Error",
                             message="No se Encuentra el archivo")
@@ -508,26 +514,55 @@ class ThreadedTask(threading.Thread):
         # Busqeuda de archivos en la carpeta de busqueda
         mypath = self.rutaBusqueda
         onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-        print(f"Ruta busqeudda: {onlyfiles}")
+ 
         columnaTotal = xls[self.columnaAnaliza]
+        noEsta = []
+        archivosEncontrados = []
+        banderaError = False
+        contador = 0
+        print(f"Largo de archivo: {len(columnaTotal)}")
         for i in columnaTotal:
             for j in onlyfiles:
-                if i in j:
-                    origen = os.path.join(mypath,i)
+                if str(i) in j:
+                    archivosEncontrados.append(j)
+                    origen = os.path.join(mypath,j)
                     destino =os.path.join(self.rutaDestino,j)
-                    print(f"ruta total: {origen}")
+                    # origen = mypath + "/"+j
+                    # destino =self.rutaDestino+"/"+j
+
                     try:
                         copyfile(origen,destino)
                     except Exception as e:
                         print(f"No se logro copiar el archivo")
                         print(e)
                         messagebox.showinfo('Upss!', 
-                                            f'No se copio el archivo: {i}')
-        
+                                            f'No se copio el archivo: {j}')
+                        banderaError = True
+            contador = contador + 1
+            print(f"Fila: {contador}")
             
-        self.ventanaIni.destroy()
-        messagebox.showinfo('Proceso finalizado', 'Se copiaron los archivos')
-
+        self.ventanaIni.destroy()            
+        # Hacer una interseccion de archivos
+        
+        for archivo in onlyfiles:
+            if not archivo in archivosEncontrados:
+                noEsta.append(str(archivo))
+        print(f"Los que no encontro: {noEsta}")
+        destino =os.path.join(self.rutaDestino,"archivos_no_encontrados.csv")
+        df = pd.DataFrame(noEsta,columns=["No Encontrados"])
+        try:
+            df.to_csv(destino)
+        except PermissionError:
+            messagebox.showerror('Error', 
+            'No se pudo guardar el archivo con los resultados no encontrados. '+
+            'Porfavor cierre el archivo de resultados abierto')      
+        
+        if banderaError:
+            messagebox.showinfo('Proceso finalizado', 
+            'Se copiaron parcialmente los archivos con algunos errrores')  
+        else:
+            messagebox.showinfo('Proceso finalizado', 
+            'Se copiaron todos los archivos encontrados')  
 
 
     
